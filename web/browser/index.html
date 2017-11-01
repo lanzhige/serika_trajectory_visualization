@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="author" content="selika">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-COMPATIBLE" content="IE-Edge">
+
+  <title>TrajVis</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="./utils/css/bootstrap.min.css" rel="stylesheet">
+  <link href="./utils/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <link href="./utils/css/animate.css" rel="stylesheet">
+  <link href="./utils/css/style.css" rel="stylesheet">
+
+  <link href="./utils/CodeMirror/lib/codemirror.css" rel="stylesheet">
+  <link href="./utils/CodeMirror/theme/ambiance.css" rel="stylesheet">
+
+  <link href="./utils/ion.rangeSlider/css/ion.rangeSlider.css" rel="stylesheet">
+  <link href="./utils/ion.rangeSlider/css/ion.rangeSlider.skinFlat.css" rel="stylesheet">
+
+  <link href="./utils/jasny-bootstrap/css/jasny-bootstrap.min.css" rel="stylesheet">
+  <link href="./utils/daterangepicker/daterangepicker.css" rel="stylesheet">
+  <link href="./utils/clockpicker/bootstrap-clockpicker.min.css" rel="stylesheet">
+
+  <link href="./utils/css/selika.css" rel="stylesheet">
+</head>
+
+<body class="pace-done mini-navbar">
+<div id="wrapper">
+  <nav id="left-navbar" class="navbar-default navbar-static-side left-layout" role="navigation">
+    <div class="sidebar-collapse" style="width: 100%; height: 100%">
+      <div class = "left-layout-chord">
+        <div class = "poi-info"></div>
+      </div>
+    </div>
+  </nav>
+  <div id="page-wrapper" class="white-bg">
+    <div class="row border-bottom">
+      <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+          <a id="left-toggle-buttom"
+             class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#">
+            <i class="fa fa-bars"></i>
+          </a>
+          <a href="#" class="navbar-brand">Traj<b>V</b>is</a>
+        </div>
+        <form class="time-selector-form">
+          <div class="form-group">
+            <div class="input-group">
+					  <span class="input-group-addon">
+						  <span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
+					  </span>
+              <div id="choosedaterange" class="pull-right" style="background: #fff;
+        cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                <span></span> <b class="caret"></b>
+              </div>
+            </div>
+          </div>
+        </form>
+        <form class="time-selector-form">
+          <div class="form-group">
+            <div class="input-group" data-autoclose="true">
+				    <span class="input-group-addon">
+					    <span class="glyphicon glyphicon-time fa fa-clock-o"></span>
+				    </span>
+              <input type="text" class="form-control clockpicker" id="choosetimestart">
+              <span class="input-group-addon">to</span>
+              <input type="text" class="form-control" id="choosetimeend">
+            </div>
+          </div>
+        </form>
+        <ul class="nav navbar-top-links navbar-right">
+          <li>
+            <a href="#" id="rect-geoobj" data-toggle="tooltip" title="Add GeoObj">
+              <i id="rect-geoobj-icon" class="fa fa-square-o"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" id="draw_circle" data-toggle="tooltip" title="Radar/Move">
+              <i id="draw-radar-icon" class="fa fa-circle-o"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" id="reset-all" data-toggle="tooltip" title="Reset">
+              <i id="reset-icon" class="fa fa-undo"></i>
+            </a>
+          </li>
+           <li>
+             <a href="#" id="heatmap-download" data-toggle="tooltip" title="HeatMap">
+               <i class="fa fa-header" aria-hidden="true"></i>
+             </a>
+          </li>
+          <li>
+            <a href="#" id="flow-overlay" data-toggle="tooltip" title="edges">
+              <i id="display-flow-overlay" class="fa fa-map-o"></i>
+            </a>
+          </li>
+          <li><a class="right-sidebar-toggle" data-toggle="tooltip" title="Settings">
+            <i class="fa fa-cog"></i></a>
+          </li>
+          <li id="play-icon-container"><a href="#" id="btn-set-play" data-toggle="tooltip" title="Play/Pause">
+            <i id="play-icon" class="fa fa-play"></i></a>
+          </li>
+          <li><a href="#" id="btn-set-reset" data-toggle="tooltip" title="clear Heat Map">
+            <i class="fa fa-repeat"></i></a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    <div id="map_canvas">
+      <div id="gmaps" style="width: 100%;height:100%;
+        background:rgba(0,0,0,0.0); position:absolute;z-index:1;">
+      </div>
+      <div id="POI-info">
+        <img id="place-icon" src="" height="16" width="16">
+        <span id="place-name"  class="title"></span>  &nbsp;&nbsp;&nbsp;
+        <button id="POI-add" class="btn-info">add POI</button> &nbsp;
+        <button id="POI-select" class="btn-info">select POI</button> &nbsp;
+        <button id="POI-display-chord" class="btn-info">display</button>
+        <br>
+        <span id="place-address"></span>
+      </div>
+      <div id="chord-test-1"></div>
+      <div id="chord-test-2"></div>
+    </div>
+  </div>
+
+  <div id="right-sidebar">
+    <div class="sidebar-container">
+      <ul class="nav nav-tabs navs-3">
+        <li class="active">
+          <a data-toggle="tab" href="#tab-1"><i class="fa fa-map"></i></a>
+        </li>
+        <li>
+          <a data-toggle="tab" href="#tab-2"><i class="fa fa-gear"></i></a>
+        </li>
+        <li>
+          <a data-toggle="tab" href="#tab-3"><i class="fa fa-ellipsis-h"></i></a>
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        <div id="tab-1" class="tab-pane active">
+          <div class="sidebar-title">
+            <h3> <i class="fa fa-cube"></i> Map Settings</h3>
+            <small><i class="fa fa-tim"></i> Change Heat Map Settings</small>
+          </div>
+          <div class="sidebar-content">
+            <h4>Heat Map Settings</h4>
+            <div class="form-group">
+              <div class="panel-settings-group">
+                <label>Time Window</label>
+                <input type="text" id="time_window" class="pull-right" size="5"
+                     style="color:#f6931f; font-weight:bold;">
+              </div>
+              <div id="slider_time_window"></div>
+              <br />
+              <div class="panel-settings-group">
+                <label>Time Interval</label>
+                <input type="text" id="time-interval" class="pull-right" size="5"
+                     style="color:#f6931f; font-weight:bold;">
+              </div>
+              <div id="slider-time-interval"></div>
+              <br />
+              <div class="panel-settings-group">
+                <label>Delay</label>
+                <input type="text" id="heatmap_delay" class="pull-right" size="5"
+                     style="color:#f6931f; font-weight:bold;">
+              </div>
+              <div id="slider_heatmap_delay"></div>
+              <br />
+            </div>
+            <h4> HeatMap Display</h4>
+            <div class="form-group">
+              <span>HeatMap</span>
+              <div class="switch">
+                <div class="onoffswitch">
+                  <input type="checkbox" name="collapsemenu" class="onoffswitch-checkbox"
+                         id="toggle-heatmap">
+                  <label class="onoffswitch-label" for="toggle-heatmap">
+                    <span class="onoffswitch-inner"></span>
+                    <span class="onoffswitch-switch"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-2" class="tab-pane">
+          <div class="sidebar-title">
+            <h3><i class="fa fa-gears"></i> Settings</h3>
+            <small><i class="fa fa-tim"></i> Display options.</small>
+          </div>
+          <div class="sidebar-content">
+            <h4> Line Settings</h4>
+            <div class="form-group">
+              <div class="panel-settings-group">
+                <label>Opacity</label>
+                <input type="text" id="line-opacity" class="pull-right" size="5"
+                     style="color:#f6931f; font-weight:bold;">
+              </div>
+              <div id="sliderdtspeed"></div>
+              <br />
+            </div>
+            <h4>Parameter Settings</h4>
+            <div class="form-group">
+
+              <div class="panel-settings-group">
+                <label>K</label>
+                <input type="text" id="edge-bundling-K" class="pull-right" size="5"
+                       style="color:#f6931f; font-weight:bold;">
+              </div>
+              <br />
+
+              <div class="panel-settings-group">
+                <label>S</label>
+                <input type="text" id="edge-bundling-S" class="pull-right" size="5"
+                       style="color:#f6931f; font-weight:bold;">
+              </div>
+              <br />
+
+              <div class="panel-settings-group">
+                <label>P</label>
+                <input type="text" id="edge-bundling-P" class="pull-right" size="5"
+                       style="color:#f6931f; font-weight:bold;">
+              </div>
+              <br />
+
+              <div class="panel-settings-group">
+                <label>P-rate</label>
+                <input type="text" id="edge-bundling-Prate" class="pull-right" size="5"
+                       style="color:#f6931f; font-weight:bold;">
+              </div>
+              <br />
+
+              <div class="panel-settings-group">
+                <label>C</label>
+                <input type="text" id="edge-bundling-C" class="pull-right" size="5"
+                       style="color:#f6931f; font-weight:bold;">
+              </div>
+              <br />
+
+              <div class="panel-settings-group">
+                <label>I</label>
+                <input type="text" id="edge-bundling-I" class="pull-right" size="5"
+                       style="color:#f6931f; font-weight:bold;">
+              </div>
+              <br />
+
+              <div class="panel-settings-group">
+                <label>I-rate</label>
+                <input type="text" id="edge-bundling-Irate" class="pull-right" size="5"
+                       style="color:#f6931f; font-weight:bold;">
+              </div>
+              <br />
+
+              <div class="panel-settings-group">
+                <label>Threshold</label>
+                <input type="text" id="edge-bundling-threshold" class="pull-right" size="5"
+                       style="color:#f6931f; font-weight:bold;">
+              </div>
+              <br />
+
+              <label>Edge Number</label>
+              <input type="text" class="form-control" value="0" id="edge-number">
+              <br />
+            </div>
+            <h4> Edges Display</h4>
+            <div class="form-group">
+              <span>Edges</span>
+              <div class="switch">
+                <div class="onoffswitch">
+                  <input type="checkbox" name="collapsemenu" class="onoffswitch-checkbox"
+                       id="toggle-edges">
+                  <label class="onoffswitch-label" for="toggle-edges">
+                    <span class="onoffswitch-inner"></span>
+                    <span class="onoffswitch-switch"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-3" class="tab-pane">
+          <div class="sidebar-title">
+            <h3> <i class="fa fa-cube"></i>Other Settings</h3>
+            <small><i class="fa fa-tim"></i>Optional Settings.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row" id="contentrow">
+    <div class="modal modal-info" id="modal-dataloading" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Loading Data</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="progress progress-sm active">
+                        <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
+                             aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                        </div>
+                    </div>
+                    This will take a moment...
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal inmodal fade" id="radarModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+          <span aria-hidden="true">&times;</span>
+          <span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title">Radar Chart</h4>
+      </div>
+      <div class="modal-body">
+        <!--<canvas id="radar_canvas" width="400" height="400"></canvas>-->
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary dim" id="renderRadar" data-dismiss="modal">
+          Get! </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="video-controller-container">
+  <div id="video-controller-background"></div>
+  <div id="video-controller-body">
+    <div id="heatmap-video">
+
+    </div>
+  </div>
+</div>
+
+<script src="./utils/jquery.min.js"></script>
+<script src="./utils/jquery-ui/jquery-ui.min.js"></script>
+<script src="./utils/metisMenu/dist/metisMenu.min.js"></script>
+<script src="./utils/jQuery-slimScroll/jquery.slimscroll.min.js"></script>
+<script src="./utils/bootstrap/js/bootstrap.min.js"></script>
+
+<script src="./utils/inspinia/inspinia.js"></script>
+<script src="./utils/pace/pace.min.js"></script>
+<!--maps-->
+<!--<script src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=geometry"></script>-->
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFyszhCAngi3yjbANjiedbpMpSvbb36Bw&libraries=places,geometry"></script>
+<script src="./utils/heatmap.js"></script>
+<script src="./utils/gmaps-heatmap/gmaps-heatmap.js"></script>
+
+<!--slider-->
+<script src="./utils/moment/moment-with-locales.min.js"></script>
+<script src="./utils/ion.rangeSlider/js/ion-rangeSlider/ion.rangeSlider.min.js"></script>
+
+<script src="./utils/jasny-bootstrap/js/jasny-bootstrap.min.js"></script>
+<!--date and time picker-->
+<script src="./utils/daterangepicker/daterangepicker.js"></script>
+<script src="./utils/clockpicker/bootstrap-clockpicker.min.js"></script>
+
+<script src="./utils/chart/Chart.bundle.min.js"></script>
+<!--<script src="./utils/Highcharts/code/highcharts.js"></script>
+<script src="./utils/line-highcharts.js"></script>-->
+<script src="./utils/Highcharts/code/highcharts.js"></script>
+<script src="./ClickEventHandler.js"></script>
+<script src="./line-chart.js"></script>
+<script src="./radar-chart.js"></script>
+<script src="heatmapobj.js"></script>
+<script src="./utils/coordtransform/index.js"></script>
+<script src="./radar-chart-container.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="./chord-diagram.js"></script>
+<!-- Placed at the end of the document so the pages load faster -->
+<script type="text/javascript">
+  //------------initialization----------
+  {
+    //-------------heat map initialization-------
+    var heatmap;
+    var center_latLng=new google.maps.LatLng(39.909,116.4505);
+    var gmaps_option={
+      zoom:12,
+      center:center_latLng,
+      clickableIcons:true
+      //mapTypeId:google.maps.MapTypeId.TERRAIN
+      //mapTypeId:google.maps.MapTypeId.ROADMAP
+    };
+    var map=new google.maps.Map(document.getElementById("gmaps"),gmaps_option);
+    heatmap=new HeatmapOverlay(map,{
+      "radius": 30,
+      "maxOpacity": 0.5,
+      // scales the radius based on map zoom
+      "scaleRadius": false,
+      // if set to false the heatmap uses the global maximum for colorization
+      // if activated: uses the data maximum within the current map boundaries
+      //   (there will always be a red spot with useLocalExtremas true)
+      "useLocalExtrema": false,
+      // which field name in your data represents the latitude - default "lat"
+      latField: 'lat',
+      // which field name in your data represents the longitude - default "lng"
+      lngField: 'lng',
+      // which field name in your data represents the data value - default "value"
+      valueField: 'count'
+    });
+
+    var clickHandler = new ClickEventHandler(map);
+    $("#POI-add").on("click",function(){
+        if (this.textContent=="add POI") {
+            POI_id_list.push(clickHandler.placeInfo.place_id);
+            POI_geo_id_list.push(gmap_obj_array.length);
+
+            var geoobj = {
+                type: "circle",
+                content: undefined,
+                marker:undefined,
+                info_window:undefined,
+                title: ""+gmap_obj_array.length,
+                cnt_pixel:{x:clickHandler.event.ta.x,y:clickHandler.event.ta.y},
+                chord_diagram:undefined,
+                chord_data:undefined
+            };
+
+            geoobj.content = new google.maps.Circle({
+                clickable:false,
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: '#FF0000',
+                fillOpacity: 0.35,
+                map: map,
+                center:{
+                    lat:(clickHandler.placeInfo.geometry.viewport.f.f+clickHandler.placeInfo.geometry.viewport.f.b)/2.0,
+                    lng:(clickHandler.placeInfo.geometry.viewport.b.f+clickHandler.placeInfo.geometry.viewport.b.b)/2.0
+                },
+                radius:1000
+            });
+            addGeoObj(geoobj, gmap_obj_array.length);
+            gmap_obj_array.push(geoobj);
+            this.textContent = "remove POI";
+            return;
+        }
+        if (this.textContent=="remove POI"){
+            var place_id = clickHandler.placeInfo.place_id;
+            var index = POI_id_list.indexOf(place_id);
+            var geoobj_index = POI_geo_id_list[index];
+            POI_id_list.splice(index,1);
+            POI_geo_id_list.splice(index,1);
+            removeGeoObj(gmap_obj_array[geoobj_index]);
+            if (geoobj_index==cnt_geoobj){
+                cnt_geoobj=undefined;
+                $("#POI-display-chord").prop("disabled",true);
+                $("#POI-select").textContent="select POI";
+            }
+            connection.send(JSON.stringify({op:7,id:geoobj_index}));
+            this.textContent = "add POI";
+        }
+    });
+
+    $("#POI-select").on("click",function(){
+        if (this.textContent == "select POI"){
+            var place_id = clickHandler.placeInfo.place_id;
+            var index = POI_id_list.indexOf(place_id);
+            if (index==-1) {
+                POI_id_list.push(clickHandler.placeInfo.place_id);
+                POI_geo_id_list.push(gmap_obj_array.length);
+
+                var geoobj = {
+                    type: "circle",
+                    content: undefined,
+                    marker:undefined,
+                    info_window:undefined,
+                    title: ""+gmap_obj_array.length,
+                    cnt_pixel:{x:clickHandler.event.ta.x,y:clickHandler.event.ta.y},
+                    chord_diagram:undefined,
+                    chord_data:undefined
+                };
+
+                geoobj.content = new google.maps.Circle({
+                    clickable:false,
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: '#FF0000',
+                    fillOpacity: 0.35,
+                    map: map,
+                    center:{
+                        lat:(clickHandler.placeInfo.geometry.viewport.f.f+clickHandler.placeInfo.geometry.viewport.f.b)/2.0,
+                        lng:(clickHandler.placeInfo.geometry.viewport.b.f+clickHandler.placeInfo.geometry.viewport.b.b)/2.0
+                    },
+                    radius:1000
+                });
+                addGeoObj(geoobj, gmap_obj_array.length);
+                gmap_obj_array.push(geoobj);
+                $("#POI-add").textContent = "remove POI";
+            }
+            index = POI_id_list.indexOf(place_id);
+            var geoobj_index = POI_geo_id_list[index];
+            selectGeoObj(geoobj_index);
+            cnt_geoobj=geoobj_index;
+            $("#POI-display-chord").prop("disabled",false);
+            this.textContent = "cancel select";
+            return;
+        }
+        if (this.textContent =="cancel select"){
+            cnt_geoobj=undefined;
+            $("#POI-display-chord").prop("disabled",true);
+            this.textContent = "select POI";
+        }
+    });
+
+    $("#POI-display-chord").on('click',function(){
+        if (this.textContent == "display"){
+            var place_id = clickHandler.placeInfo.place_id;
+            POI_display_list.push(place_id);
+            var index = POI_id_list.indexOf(place_id);
+            if (index==-1) {
+                POI_id_list.push(clickHandler.placeInfo.place_id);
+                POI_geo_id_list.push(gmap_obj_array.length);
+
+                var geoobj = {
+                    type: "circle",
+                    content: undefined,
+                    marker:undefined,
+                    info_window:undefined,
+                    title: ""+gmap_obj_array.length,
+                    cnt_pixel:{x:clickHandler.event.ta.x,y:clickHandler.event.ta.y},
+                    chord_diagram:undefined,
+                    chord_data:undefined
+                };
+
+                geoobj.content = new google.maps.Circle({
+                    clickable:false,
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: '#FF0000',
+                    fillOpacity: 0.35,
+                    map: map,
+                    center:{
+                        lat:(clickHandler.placeInfo.geometry.viewport.f.f+clickHandler.placeInfo.geometry.viewport.f.b)/2.0,
+                        lng:(clickHandler.placeInfo.geometry.viewport.b.f+clickHandler.placeInfo.geometry.viewport.b.b)/2.0
+                    },
+                    radius:1000
+                });
+                addGeoObj(geoobj, gmap_obj_array.length);
+                gmap_obj_array.push(geoobj);
+                $("#POI-add").textContent = "remove POI";
+            }
+            index = POI_id_list.indexOf(place_id);
+            var geoobj_index = POI_geo_id_list[index];
+            addChord(geoobj_index);
+            //this.prop("disabled",true);
+        }
+        if (this.textContent == "hide"){
+
+        }
+    });
+
+    function addChord(id){
+        connection.send(JSON.stringify({
+            op:5,
+            id:id
+        }));
+    }
+    //-------------video controller initialization-----------
+    var video_controller_container=$("#video-controller-container");
+    video_controller_container.offset({
+      "top":$("#gmaps").height()-video_controller_container.height(),
+      "left":$("#left-navbar").width()
+    });
+    $("#left-toggle-buttom").click(function(){
+      var left=$("#left-navbar").width();
+
+      video_controller_container.offset({
+        "left": 290-parseInt(left)
+      });
+      video_controller_container.hide();
+      setTimeout(function(){video_controller_container.fadeIn(400)},100);
+    });
+
+    //video_controller_container.hide();
+    var video_slider=$("#heatmap-video");
+
+    //------------right cfg bar initialization--------
+    var linkChartToggle=$("#link-charttoggle").click(function(){
+      $("#box-query").toggle({
+        "duration": 125
+      });
+    });
+    var linkRadarToggle=$("#link-radartoggle").click(function(){
+      $("#box-query").toggle({
+        "duration": 125
+      });
+    });
+    var closeChartDialog=$("#box-query-close").click(function(){
+      $("box-query").toggle({
+        "duration":125
+      });
+    });
+
+    //-----------variables-----
+    var delay=500;
+    var slice_num=0;
+    var heatmap_max=0;
+    var heatmap_cfg={
+      op:0,
+      lat_top:undefined,
+      lat_bottom:undefined,
+      lng_left:undefined,
+      lng_right:undefined,
+      start_time:undefined,
+      end_time:undefined,
+      grids_row:100,
+      grids_col:100,
+      time_window:7200,
+      time_interval:300
+    };
+    var radar_chart_msg={
+      start_time:undefined,
+      end_time:undefined,
+      time_window:7200,
+      time_interval:300,
+      r:undefined,
+      lat:undefined,
+      lng:undefined,
+      arg:8,
+      id:-1,
+      op:1
+    };
+    var flow_cfg={
+      start_time:undefined,
+      end_time:undefined,
+      time_interval:300,
+      time_window:3600,
+      op:2,
+      lat_top:undefined,
+      lat_bottom:undefined,
+      lng_left:undefined,
+      lng_right:undefined,
+      K:1,
+      S:0.1,
+      P:1,
+      P_rate:2,
+      C:0,
+      I:70,
+      I_rate:0.6666667,
+      threshold:0.6
+    };
+
+    var heatmap_obj=new HeatMapObj(heatmap);
+    var radar_container_list=[];
+    var slider_init=0;
+    //---------------chart initialization
+    Chart.defaults.global.animation.duration=100;
+    var gmap_circle=[],gmap_marker=[],gmap_edges=[];
+    var POI_id_list=[];
+    var POI_geo_id_list=[];
+    var POI_display_list=[];
+    var cnt_geoobj=undefined;
+    var circle_is_drawing=false,circle_r=0,circle_x,circle_y;
+    var circle_center_left=undefined,circle_center_top=undefined;
+    var line_opacity=0.06;
+    var heatmap_display=1;
+    var edge_display=1;
+    var mouse_tool="default";
+    var pre_pos = {lat:undefined,lng:undefined};
+    var current_pos = {lat:undefined,lng:undefined};
+    var pre_pos_pixel = {x:undefined,y:undefined};
+    var current_pos_pixel = {x:undefined,y:undefined};
+    var mousedown_onmap = false;
+    var gmap_obj_array=[];
+    var min_display_distance=0.0001;
+  }
+
+  //-----------------global functions--------
+  {
+    function set_boundary(that){
+      var map_bounds=map.getBounds();
+      var coord1=coordtransform.gcj02towgs84(map_bounds.b.b,map_bounds.f.b);
+      var coord2=coordtransform.gcj02towgs84(map_bounds.b.f,map_bounds.f.f);
+      that.lat_top=coord2[1];
+      that.lat_bottom=coord1[1];
+      that.lng_left=coord1[0];
+      that.lng_right=coord2[0];
+    }
+
+    function send_message(msg){
+        loading_data();
+        connection.send(msg);
+    }
+
+    function loading_data(){
+        $("#modal-dataloading").modal({
+            "backdrop": "static",
+            "keyboard": !1,
+            "show": !0
+        });
+    }
+
+    function hide_dataloading(){
+        $("#modal-dataloading").modal("hide");
+    }
+  }
+
+  //-----------------time selector-----------
+  {
+    var choose_time_start=$("#choosetimestart");
+    choose_time_start.clockpicker({
+      "placement": "bottom",
+      "align": "left",
+      "donetext": "Done",
+      "autoclose": !0,
+      "default": "now",
+      "fromnow": 15e3
+    });
+    //var t = moment().subtract(60, "m").format("HH:mm");
+    choose_time_start.val(moment().subtract(60, "m").format("HH:mm"));
+    var choose_time_end=$("#choosetimeend");
+    choose_time_end.clockpicker({
+      "placement": "bottom",
+      "align": "left",
+      "donetext": "Done",
+      "autoclose": !0
+    });
+    //var e = moment().add(60, "m").format("HH:mm");
+    choose_time_end.val(moment().add(60, "m").format("HH:mm"));
+    var choose_date_range=$("#choosedaterange");
+    choose_date_range.daterangepicker({
+      "alwaysShowCalendars": !0,
+      "opens": "right"
+    }, setDateRangeSpan);
+    var start_date = moment("2008-02-06"),
+        end_date = moment("2008-02-09");
+    choose_date_range.data("daterangepicker").setStartDate(start_date);
+    choose_date_range.data("daterangepicker").setEndDate(end_date);
+    choose_date_range.data("daterangepicker").updateCalendars();
+    setDateRangeSpan(start_date, end_date);
+
+    function setDateRangeSpan(start_date, end_date) {
+      $("#choosedaterange span").html(start_date.format("ddd D MMMM, YY")
+          + " - " + end_date.format("ddd D MMMM, YY"))
+    }
+    function setTimeRange(){
+      var  date_range = $("#choosedaterange").data("daterangepicker"),
+          start_date = date_range.startDate.unix(),
+          end_date = date_range.endDate.unix(),
+          start_time = $("#choosetimestart").clockpicker().val(),
+          end_time = $("#choosetimeend").clockpicker().val(),
+          hour_min_st = moment(start_time, "HH:mm"),
+          hour_min_et = moment(end_time, "HH:mm"),
+          utc_start_time = hour_min_st.utc().unix(),
+          utc_end_time = hour_min_et.utc().unix(),
+          utc_offset = moment().utcOffset();
+      var time_range={
+        "start_time": utc_start_time,
+        "end_time": utc_end_time,
+        "start_date": start_date,
+        "end_date": end_date,
+        "qindex": 0,
+        "utcoffset": utc_offset,
+        "leadoffset": 30
+      };
+
+      return time_range;
+    }
+  }
+
+  //-----------------websocket initialization---------
+  {
+    if (window.WebSocket!=undefined){
+      var connection = new WebSocket('ws://172.29.35.126:9002/echo');
+      waitForSocketConnection(connection);
+      connection.onopen=wsOpen;
+      //var test = interact_use_mouse();
+    }
+
+    function waitForSocketConnection(socket, callback){
+      setTimeout(
+          function () {
+            if (socket.readyState === 1) {
+              console.log("Connection is made");
+              if(callback != null){
+                callback();
+              }
+            } else {
+              console.log("wait for connection...");
+              waitForSocketConnection(socket, callback);
+            }
+          }, 5); // wait 5 milisecond for the connection...
+    }
+  }
+
+  //-------------right side bar---------------
+  {
+    var heatmap_interval=$("#slider_time_window").ionRangeSlider({
+      "type": "single",
+      "min": 5,
+      "max": 180,
+      "step": 15,
+      "from": 60,
+      "keyboard": !0,
+      "prettify": !1,
+      "grid": !0,
+      "onChange": function(data) {
+        heatmap_cfg.time_window = data.from*60;
+        $("#time_window").val(heatmap_cfg.time_window/60);
+        radar_chart_msg.time_window = data.from*60;
+      },
+      "onUpdate": function(data) {
+        heatmap_cfg.time_window = data.from*60;
+        radar_chart_msg.time_window = data.from*60;
+      }
+    });
+    $("#time_window").val(60);
+    $("#time_window").change(function (){
+      heatmap_cfg.time_window=$(this).val()*60;
+      var temp=$("#slider_time_window").data("ionRangeSlider");
+      temp.update({
+        "from": heatmap_cfg.time_window/60
+      });
+    });
+
+    var slider_time_interval=$("#slider-time-interval").ionRangeSlider({
+        "type": "single",
+        "min": 5,
+        "max": 60,
+        "step": 5,
+        "from": 5,
+        "keyboard": !0,
+        "prettify": !1,
+        "grid": !0,
+        "onChange": function(data) {
+            heatmap_cfg.time_interval = data.from*60;
+            radar_chart_msg.time_interval = data.from*60;
+            $("#time-interval").val(heatmap_cfg.time_interval/60);
+        },
+        "onUpdate": function(data) {
+            heatmap_cfg.time_interval = data.from*60;
+            radar_chart_msg.time_interval = data.from*60;
+        }
+    });
+
+    $("#time-interval").val(5);
+    $("#time-interval").change(function (){
+        heatmap_cfg.time_interval=$(this).val()*60;
+        radar_chart_msg.time_interval=$(this).val()*60;
+        var temp=$("#slider-time-interval").data("ionRangeSlider");
+        temp.update({
+            "from": heatmap_cfg.time_window/60
+        });
+    });
+
+    var heatmap_delay=$("#slider_heatmap_delay").ionRangeSlider({
+      "type": "single",
+      "min": 50,
+      "max": 1000,
+      "step": 50,
+      "from": 500,
+      "keyboard": !0,
+      "prettify": !1,
+      "grid": !0,
+      "onChange": function(data) {
+        delay = data.from; $("#heatmap_delay").val(delay)
+      },
+      "onUpdate": function(data) {
+        delay = data.from
+      }
+    });
+    $("#heatmap_delay").val(500);
+    $("#heatmap_delay").change(function (){
+      delay=$(this).val();
+      var temp=$("#slider_heatmap_delay").data("ionRangeSlider");
+      temp.update({
+        "from": delay
+      });
+    });
+
+    $("#toggle-heatmap").click(function(){
+      if (heatmap_display==0) {
+        heatmap_display=1;
+        $(heatmap_obj.heatmap.container).show();
+      }else{
+        heatmap_display=0;
+        heatmap_obj.hide();
+      }
+    });
+
+    $("#line-opacity").val(line_opacity).change(function(){
+      line_opacity=$(this).val();
+      for (var i=0;i<gmap_edges.length;i++) gmap_edges[i].strokeOpacity=line_opacity;
+    });
+
+    $("#edge-bundling-K").val(flow_cfg.K).change(function(){
+      flow_cfg.K=$(this).val();
+    });
+
+    $("#edge-bundling-S").val(flow_cfg.S).change(function(){
+      flow_cfg.S=$(this).val();
+    });
+
+    $("#edge-bundling-P").val(flow_cfg.P).change(function(){
+      flow_cfg.P=$(this).val();
+    });
+
+    $("#edge-bundling-Prate").val(flow_cfg.P_rate).change(function(){
+      flow_cfg.P_rate=$(this).val();
+    });
+
+    $("#edge-bundling-C").val(flow_cfg.C).change(function(){
+      flow_cfg.C=$(this).val();
+    });
+
+    $("#edge-bundling-I").val(flow_cfg.I).change(function(){
+      flow_cfg.I=$(this).val();
+    });
+
+    $("#edge-bundling-Irate").val(flow_cfg.I_rate).change(function(){
+      flow_cfg.I_rate=$(this).val();
+    });
+
+    $("#edge-bundling-threshold").val(flow_cfg.threshold).change(function(){
+      flow_cfg.threshold=$(this).val();
+    });
+
+    $("#toggle-edges").click(function(){
+
+    });
+  }
+
+  //-------------map interaction--------------
+  /*{
+    map.addListener('zoom_changed',function(){
+      set_boundary(heatmap_cfg);
+      if (heatmap_cfg.start_time!=undefined) send_message(JSON.stringify(heatmap_cfg));
+    });
+
+    map.addListener('dragend',function(){
+      set_boundary(heatmap_cfg);
+      if (heatmap_cfg.start_time!=undefined) send_message(JSON.stringify(heatmap_cfg));
+    });
+  }
+*/
+  //--------------time controller-------------
+  {
+    var play=0;
+    $("#btn-set-play").click(function(t){
+      if (play==1) play=0; else play=1;
+      if (play==1) {
+        setPlayIcon();
+        $("#radar-chart-div").show();
+        $("#radar-chart-div").draggable();
+        var i = slice_num;
+        var interval= setInterval(function () {
+          if (play==0) window.clearInterval(interval);
+          video_slider.data("ionRangeSlider").update({
+            "from": +moment(heatmap_obj.cfg.start_time*1000+i*1000
+                *heatmap_obj.cfg.time_interval).format("X"),
+            "to":+moment(heatmap_obj.cfg.start_time*1000+heatmap_obj.cfg.time_window*1000
+                +1000*i*heatmap_obj.cfg.time_interval).format("X")
+          });
+          heatmap.setData({
+            min: 0,
+            max: heatmap_max,
+            data: heatmap_obj.dataset[i]
+          });
+          if (radar_container_list.length>0){
+            for (var j=0;j<radar_container_list.length;j++){
+              radar_container_list[j].setVisible(i);
+              radar_container_list[j].display();
+            }
+          }
+          i++;
+          if (i > Math.floor((heatmap_obj.cfg.end_time - heatmap_obj.cfg.start_time
+                  -heatmap_obj.cfg.time_window) / heatmap_obj.cfg.time_interval)) {
+            if (play==1) play=0; else play=1;
+            setPlayIcon();
+            window.clearInterval(interval);
+          }
+        }, delay);
+      }else{
+        //$("#radar-chart-div").hide();
+        setPlayIcon();
+      }
+    });
+
+    $("#btn-set-reset").click(function(t){
+        heatmap.setData({min:0,max:1,data:[]});
+    });
+
+    function setPlayIcon(){
+      if (play==1){
+        $("#play-icon").remove();
+        $("#btn-set-play").append('<i id="play-icon" class="fa fa-pause"></i>');
+      }else{
+        $("#play-icon").remove();
+        $("#btn-set-play").append('<i id="play-icon" class="fa fa-play"></i>');
+      }
+    }
+  }
+
+  //--------------heatmap interaction---------
+  {
+    function get_heatmap(){
+      var time=setTimeRange();
+      var cfg={
+        start_time:(time.start_time-time.start_date)%86400+time.start_date+28800,
+        end_time:time.end_date-86400+(time.end_time-time.end_date)%86400+1+28800
+      };
+      heatmap_cfg=jQuery.extend(true,heatmap_cfg,cfg);
+
+      if (heatmap_cfg.start_time!=undefined){
+        set_boundary(heatmap_cfg);
+        send_message(JSON.stringify(heatmap_cfg));
+        console.log(JSON.stringify(heatmap_cfg));
+      }
+    }
+
+    $("#heatmap-download").click(get_heatmap);
+  }
+  //--------------draw pattern on gmap--------
+  {
+      function drawCircle(pre_pos,current_pos){
+          //var center=jQuery.extend(true,{},pre_pos);
+          //var circum=jQuery.extend(true,{},current_pos);
+          var center = new google.maps.LatLng({lat:pre_pos.lat,lng:pre_pos.lng});
+          var circum = new google.maps.LatLng({lat:current_pos.lat,lng:current_pos.lng});
+          return new google.maps.Circle({
+              clickable:false,
+              strokeColor: '#FF0000',
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: '#FF0000',
+              fillOpacity: 0.35,
+              map: map,
+              center:{lat:pre_pos.lat,lng:pre_pos.lng},
+              radius:google.maps.geometry.spherical.computeDistanceBetween(
+                  circum,center
+              )
+          });
+      }
+
+      function drawRect(coord1,coord2){
+          var left_top,right_bottom;
+          left_top={
+              lat:Math.max(coord1.lat,coord2.lat),
+              lng:Math.min(coord1.lng,coord2.lng)
+          };
+          right_bottom={
+              lat:Math.min(coord1.lat,coord2.lat),
+              lng:Math.max(coord1.lng,coord2.lng)
+          };
+          return new google.maps.Rectangle({
+              clickable:false,
+              strokeColor: '#FF0000',
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: '#FF0000',
+              fillOpacity: 0.35,
+              map: map,
+              bounds: {
+                  north: left_top.lat,
+                  south: right_bottom.lat,
+                  east: right_bottom.lng,
+                  west: left_top.lng
+              }
+          });
+      }
+  }
+
+  //--------------download POI------------------
+  function createCORSRequest(method, url) {
+      var xhr = new XMLHttpRequest();
+      if ("withCredentials" in xhr) {
+
+          // Check if the XMLHttpRequest object has a "withCredentials" property.
+          // "withCredentials" only exists on XMLHTTPRequest2 objects.
+          xhr.open(method, url, true);
+
+      } else if (typeof XDomainRequest != "undefined") {
+
+          // Otherwise, check if XDomainRequest.
+          // XDomainRequest only exists in IE, and is IE's way of making CORS requests.
+          xhr = new XDomainRequest();
+          xhr.open(method, url);
+
+      } else {
+
+          // Otherwise, CORS is not supported by the browser.
+          xhr = null;
+
+      }
+      return xhr;
+  }
+
+  function downloadPOI(){
+      var data;
+      var request = {
+          bounds:map.getBounds()
+      };
+
+      var service = new google.maps.places.PlacesService(map);
+      service.nearbySearch(request, function(results,status){
+          if (status == google.maps.places.PlacesServiceStatus.OK){
+              data = results;
+              connection.send(JSON.stringify({
+                  op:11,
+                  data:data
+              }));
+          }
+      });
+  }
+  //--------------create Geographical Object----
+  function addGeoObj(geoobj,id){
+      //downloadPOI();
+      var wrapper,time;
+      if (geoobj.type=="circle"){
+          time = setTimeRange();
+          var cnt_LngLat = coordtransform.gcj02towgs84(geoobj.content.center.lng(),geoobj.content.center.lat());
+          wrapper={
+              op:3,
+              id:id,
+              start_time: (time.start_time - time.start_date) % 86400 + time.start_date,
+              end_time: time.end_date - 86400 + (time.end_time - time.end_date) % 86400 + 1,
+              radius:geoobj.content.radius,
+              /*cnt_lat:cnt_LngLat[1],
+              cnt_lng:cnt_LngLat[0]*/
+              cnt_lat:geoobj.content.center.lat(),
+              cnt_lng:geoobj.content.center.lng()
+          };
+          console.log(wrapper);
+          if (connection!=undefined) connection.send(JSON.stringify(wrapper));
+            else console.log("uninitialized connection");
+          //return;
+      }
+      if (geoobj.type=="rect"){
+          wrapper={
+              op:3,
+              id:id,
+              left_lng:geoobj.content.bounds.b.b,
+              right_lng:geoobj.content.bounds.b.f,
+              top_lat:geoobj.content.bounds.f.b,
+              bottom_lat:geoobj.content.bounds.f.f
+          };
+          if (connection!=undefined) connection.send(JSON.stringify(wrapper));
+            else console.log("uninitialized connection");
+      }
+  }
+
+
+  function selectGeoObj(id) {
+      var time = setTimeRange();
+      var cfg = {
+          op:4,
+          start_time: (time.start_time - time.start_date) % 86400 + time.start_date,
+          end_time: time.end_date - 86400 + (time.end_time - time.end_date) % 86400 + 1,
+          id:id
+      };
+      console.log(cfg);
+      connection.send(JSON.stringify(cfg));
+  }
+
+  function removeGeoObj(obj,status){
+      removeContent(obj);
+      removeInfoWindow(obj);
+      removeMarker(obj);
+  }
+
+  function genChordDiagram(){
+      if (gmap_obj_array.length<5) return;
+      var index_array=[];
+      for (var i=0;i<gmap_obj_array.length;i++){
+          index_array.push({cfg:{
+              cnt_x:gmap_obj_array[i].cnt_pixel.x,
+              cnt_y:-gmap_obj_array[i].cnt_pixel.y
+          }});
+      }
+      var data1=[
+          [0,200,300,400],
+          [150,0,200,300],
+          [200,100,0,300],
+          [200,300,300,0]
+      ];
+      var data2=[
+          [0,150,0,150],
+          [150,0,150,150],
+          [0,150,0,150],
+          [150,150,150,0]
+      ];
+      var data3=[
+          [100,200,0,300],
+          [200,100,0,100],
+          [0,0,0,0],
+          [150,200,0,200]
+      ];
+      var data4=[
+          [150,100,200,0],
+          [100,200,300,0],
+          [200,100,50,0],
+          [0,0,0,300]
+      ];
+
+      addMarker(gmap_obj_array[0]);
+      addInfoWindow(gmap_obj_array[0]);
+
+      var chord_diagram_1 = new ChordDiagram(data1,[index_array[1],index_array[2],index_array[3],index_array[4]]
+          ,gmap_obj_array[0].info_window.content,index_array[0]);
+
+
+  }
+
+  $("#reset-all").click(function(){
+      for (var i=0;i<gmap_obj_array.length;i++){
+          gmap_obj_array[i].content.setMap(null);
+          removeInfoWindow(gmap_obj_array[i]);
+          removeMarker(gmap_obj_array[i]);
+      }
+      gmap_obj_array=[];// should change to a function to be cleaned
+      POI_display_list=[];
+      POI_geo_id_list=[];
+      POI_id_list=[];
+      console.log("reset");
+      connection.send(JSON.stringify({op:6}));
+  });
+  //--------------mouse map interaction-------
+  function setMouseTool(type){
+      mouse_tool = type;
+      if ("move"== type){
+          if (map.draggable != undefined) map.setOptions({draggable:true});
+            else map.draggable = true;
+          mouse_tool = "default";
+          map.setOptions({
+              clickableIcons:true
+          });
+          return;
+      }
+      if ("circle" == type){
+          $("#circle-geoobj-icon").toggleClass("fa fa-arrows");
+          $("#circle-geoobj-icon").toggleClass("fa fa-circle-o");
+          map.setOptions({
+              clickableIcons:false
+          });
+      }
+      if ("rect" == type){
+          $("#rect-geoobj-icon").toggleClass("fa fa-square-o");
+          $("#rect-geoobj-icon").toggleClass("fa fa-arrows");
+          map.setOptions({
+              clickableIcons:false
+          });
+      }
+      if (map.draggable==undefined) map.setOptions({draggable:false});
+          else map.draggable = false;
+  }
+
+  function cancelMouseTool(type){
+      mouse_tool = "default";
+      if ("circle" == type){
+          $("#circle-geoobj-icon").toggleClass("fa fa-arrows");
+          $("#circle-geoobj-icon").toggleClass("fa fa-circle-o");
+      }
+      if ("rect" == type){
+          $("#rect-geoobj-icon").toggleClass("fa fa-arrows");
+          $("#rect-geoobj-icon").toggleClass("fa fa-square-o");
+      }
+  }
+
+  function removeInfoWindow(obj, status){
+      if (obj.info_window == undefined) return;
+      obj.info_window.setMap(null);
+  }
+
+  function updateInfoWindow(obj, status){
+      if (obj.info_window ==undefined) return console.log("can't update an undefined info window on object: ",obj);
+  }
+
+  function addInfoWindow(obj,status){
+      if (obj.info_window != undefined) return updateInfoWindow(obj, status);
+      if (obj.marker == undefined) addMarker(obj, status);
+      var init_div = document.createElement('div');
+      init_div.id = "chord-diagram-"+obj.title;
+      init_div.className = "chord-div";
+      var info_window = new google.maps.InfoWindow({
+          content: init_div
+      });
+
+      obj.info_window = info_window;
+      info_window.open(map, obj.marker);
+  }
+
+  function removeMarker(obj, status) {
+      if (obj.marker == undefined) return;
+      if (obj.marker.setMap == undefined) return;
+      obj.marker.setMap(null);
+  }
+
+  function updateMarker(obj, status){
+      if (obj.marker == undefined) return console.log("can't update an undefined marker on object: ",obj);
+  }
+
+  function addMarker(obj, status){
+      if (obj.marker !=undefined) return updateMarker(obj,status);
+      var marker = new google.maps.Marker({
+          map:map,
+          draggable:false,
+          animation:google.maps.Animation.BOUNCE,
+          position:obj.content.center,
+          title:""+obj.title
+      });
+      obj.marker = marker;
+      marker.setMap(map);
+  }
+
+  function removeContent(obj,status){
+      if (obj.content == undefined) return;
+      if (obj.content.setMap == undefined) return;
+      obj.content.setMap(null);
+  }
+
+  function interact_use_mouse(){
+      $("#circle-geoobj").click(function(){
+          if ("circle"==mouse_tool){
+              cancelMouseTool(mouse_tool);
+              setMouseTool("move");
+          } else {
+              cancelMouseTool(mouse_tool);
+              setMouseTool("circle");
+          }
+      });
+
+      $("#rect-geoobj").click(function(){
+          if ("rect"==mouse_tool){
+              cancelMouseTool(mouse_tool);
+              setMouseTool("move");
+          } else {
+              cancelMouseTool(mouse_tool);
+              setMouseTool("rect");
+          }
+      });
+
+      map.addListener("mousedown",function(event){
+          if (mouse_tool == "default"||mousedown_onmap == true) return;
+          pre_pos.lat = event.latLng.lat();
+          pre_pos.lng = event.latLng.lng();
+          pre_pos_pixel.x = event.pixel.x;
+          pre_pos_pixel.y = event.pixel.y;
+          var title = gmap_obj_array.length;
+          gmap_obj_array.push({
+              type:mouse_tool,
+              content:undefined,
+              marker:undefined,
+              info_window:undefined,
+              title:""+title,
+              cnt_pixel:{x:pre_pos_pixel.x,y:pre_pos_pixel.y},
+              chord_diagram:undefined,
+              chord_data:undefined
+          });
+          mousedown_onmap = true;
+      });
+
+      map.addListener("mousemove",function(event){
+          if (mouse_tool == "default"||mousedown_onmap == false) return;
+          if (mouse_tool=="default") return;
+          current_pos.lat = event.latLng.lat();
+          current_pos.lng = event.latLng.lng();
+          var gmaps_obj=gmap_obj_array[gmap_obj_array.length-1];
+          if (gmaps_obj.type!=mouse_tool) return;
+          if (gmaps_obj.content==undefined){
+              if (mouse_tool=="circle") gmaps_obj.content = drawCircle(pre_pos,current_pos);
+              if (mouse_tool=="rect") gmaps_obj.content = drawRect(pre_pos,current_pos);
+          } else {
+              if (mouse_tool=="circle") {
+                  var center = new google.maps.LatLng({lat:pre_pos.lat,lng:pre_pos.lng});
+                  var circum = new google.maps.LatLng({lat:current_pos.lat,lng:current_pos.lng});
+                  gmaps_obj.content.setRadius(google.maps.geometry.spherical.computeDistanceBetween(
+                      circum, center
+                  ));
+              }
+              if (mouse_tool=="rect") {
+                  var left_top,right_bottom;
+                  left_top={
+                      lat:Math.max(pre_pos.lat,current_pos.lat),
+                      lng:Math.min(pre_pos.lng,current_pos.lng)
+                  };
+                  right_bottom={
+                      lat:Math.min(pre_pos.lat,current_pos.lat),
+                      lng:Math.max(pre_pos.lng,current_pos.lng)
+                  };
+                  gmaps_obj.content.setOptions({
+                      bounds: {
+                          north: left_top.lat,
+                          south: right_bottom.lat,
+                          east: right_bottom.lng,
+                          west: left_top.lng
+                      }
+                  });
+              }
+          }
+      });
+
+      map.addListener("mouseup",function(){
+          if (mouse_tool == "default"||mousedown_onmap == false) return;
+          if (Math.sqrt((current_pos.lat-pre_pos.lat)*(current_pos.lat-pre_pos.lat)
+                  +(current_pos.lng-pre_pos.lng)*(current_pos.lng-pre_pos.lng))<min_display_distance){
+              gmap_obj_array[gmap_obj_array.length-1].content.setMap(null);
+              gmap_obj_array.pop();
+              mousedown_onmap = false;
+              return;
+          }
+          addGeoObj(gmap_obj_array[gmap_obj_array.length-1],gmap_obj_array.length-1);
+          //genChordDiagram();
+          mousedown_onmap=false;
+      });
+  }
+
+  //--------------message receive-------------
+  function wsOpen(event){
+    //---------video controller---------
+    function show_slider(){
+      video_controller_container.show();
+
+      if (slider_init==0){
+        $("#heatmap-video").ionRangeSlider({
+          type:"double",
+          min:+moment(heatmap_cfg.start_time*1000).format("X"),
+          max:+moment(heatmap_cfg.end_time*1000).format("X"),
+          from:+moment(heatmap_cfg.start_time*1000).format("X"),
+          to:+moment(heatmap_cfg.start_time*1000+heatmap_cfg.time_window*1000).format("X"),
+          step:+moment(heatmap_cfg.time_interval*1000).format("X"),
+          keyboard:true,
+          keyboard_step:heatmap_cfg.time_interval*100/(heatmap_cfg.end_time-heatmap_cfg.start_time),
+          //from_max:+moment(heatmap_cfg.end_time*1000-heatmap_cfg.time_window*1000).format("X"),
+          grid:true,
+          force_edges:true,
+          prettify:function(num){
+            var m=moment(num,"X").locale("ja");
+            return m.format("Do, hh:mm a");
+          },
+          max_interval:+moment(heatmap_cfg.time_window*1000).format("X"),
+          min_interval:+moment(heatmap_cfg.time_window*1000).format("X"),
+          drag_interval:true,
+          "onChange": function(data) {
+            slice_num = Math.floor((data.from-heatmap_obj.cfg.start_time)/heatmap_obj.cfg.time_interval);
+            heatmap.setData({
+              min:0,
+              max:heatmap_max,
+              data:heatmap_obj.dataset[slice_num]
+            });
+            if (radar_container_list.length>0){
+              for (var j=0;j<radar_container_list.length;j++){
+                radar_container_list[j].setVisible(slice_num);
+                radar_container_list[j].display();
+              }
+            }
+          },
+          "onUpdate": function(data) {
+            slice_num = Math.floor((data.from-heatmap_obj.cfg.start_time)/heatmap_obj.cfg.time_interval);
+          }
+        });
+        slider_init=1;
+      }else{
+        video_slider.data("ionRangeSlider").update({
+          min:+moment(heatmap_cfg.start_time*1000).format("X"),
+          max:+moment(heatmap_cfg.end_time*1000).format("X"),
+          from:+moment(heatmap_cfg.start_time*1000).format("X"),
+          to:+moment(heatmap_cfg.start_time*1000+heatmap_cfg.time_window*1000).format("X"),
+          step:+moment(heatmap_cfg.time_interval*1000).format("X"),
+          keyboard:true,
+          keyboard_step:heatmap_cfg.time_interval*100/(heatmap_cfg.end_time-heatmap_cfg.start_time)
+        });
+      }
+    }
+    //------------------add mouse map interaction
+    var interact_with_mouse = interact_use_mouse();
+    //----------------------------------------------Radar Map Selector
+    $("#draw_circle").click(function(){
+      if (map.draggable==undefined) map.setOptions({draggable:false});
+      else map.setOptions({draggable:!map.draggable});
+      $("#draw-radar-icon").toggleClass("fa fa-circle-o");
+      $("#draw-radar-icon").toggleClass("fa fa-arrows");
+    });
+
+    var add_radar_window=function(cfg){
+      return new RadarChartContainer({cfg:cfg,msg:radar_chart_msg});
+    };
+
+    map.addListener("mousedown",function(event){
+      if (map.draggable!=false) return;
+      radar_chart_msg.id++;
+      circle_center_left=""+event.pixel.x+"px";
+      circle_center_top=""+event.pixel.y+"px";
+      circle_x=event.latLng.lat();
+      circle_y=event.latLng.lng();
+      //var coord=coordtransform.gcj02towgs84(lng,lat);
+      //lng=coord[0]; lat=coord[1];
+      circle_r=radar_chart_msg.r;
+      circle_is_drawing=true;
+    });
+
+    map.addListener("mousemove",function(event){
+      if (!circle_is_drawing||map.draggable!=false) return;
+      var lat=event.latLng.lat(),lng=event.latLng.lng();
+      var delta_x=circle_x-lat;
+      var delta_y=circle_y-lng;
+      circle_r=Math.sqrt(delta_x*delta_x+delta_y*delta_y);
+      var latlng1=new google.maps.LatLng({lat:lat,lng:lng}),
+          latlng2=new google.maps.LatLng({lat:circle_x,lng:circle_y});
+      var circle=gmap_circle[gmap_marker.length];
+      if (circle==undefined) {
+        circle=new google.maps.Circle({
+          clickable:false,
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35,
+          map: map,
+          center:{lat:circle_x,lng:circle_y},
+          radius:google.maps.geometry.spherical.computeDistanceBetween(
+              latlng1,latlng2
+          )
+        });
+        gmap_circle.push(circle);
+      }
+      else circle.setRadius(google.maps.geometry.spherical.computeDistanceBetween(
+          latlng1,latlng2
+      ));
+    });
+
+    map.addListener("mouseup",function(){
+      if (!circle_is_drawing||map.draggable!=false) return;
+      radar_chart_msg.lat=circle_x;
+      radar_chart_msg.lng=circle_y;
+      add_marker(circle_x,circle_y);
+      radar_chart_msg.r=circle_r;
+      circle_is_drawing=false;
+    });
+
+    function add_marker(lat,lng){
+      var latlng=new google.maps.LatLng({lat:lat,lng:lng});
+      var marker=new google.maps.Marker({
+        map:map,
+        draggable:false,
+        animation:google.maps.Animation.BOUNCE,
+        position:latlng,
+        title:lat+','+lng
+      });
+      marker.addListener('rightclick',function(){
+        for (var i=0;i<gmap_marker.length;i++)
+          if (gmap_marker[i].marker==marker){
+            if (gmap_circle[i]!=undefined) gmap_circle[i].setMap(null);
+            if (gmap_marker[i].radar_container!=undefined) {
+              gmap_marker[i].radar_container.remove();
+              for (var j=0;j<radar_container_list.length;j++)
+                if (radar_container_list[j]==gmap_marker[i].radar_container) {
+                  radar_container_list.splice(j, 1);
+                  break;
+                }
+            }
+            gmap_marker[i].marker.setMap(null);
+            break;
+          }
+        marker.setMap(null);
+      });
+
+      var time=setTimeRange();
+      var cfg={
+          start_time:(time.start_time-time.start_date)%86400+time.start_date+28800,
+          end_time:time.end_date-86400+(time.end_time-time.end_date)%86400+1+28800
+      };
+      radar_chart_msg=jQuery.extend(true,radar_chart_msg,cfg);
+      radar_chart_msg.r=circle_r;
+      radar_container_list.push(
+              add_radar_window({left:circle_center_left,top:circle_center_top,id:radar_chart_msg.id}));
+        console.log(radar_container_list);
+      gmap_marker.push({
+                marker:marker,
+                radar_container:radar_container_list[radar_container_list.length-1]
+              });
+
+      var coord=coordtransform.gcj02towgs84(lng,lat);
+      radar_chart_msg.lng=coord[0]; radar_chart_msg.lat=coord[1];
+
+      if (radar_chart_msg.start_time!=undefined){
+        send_message(JSON.stringify(radar_chart_msg));
+      }
+    }
+
+    //---------------Radar Map Selector End-----------
+    //---------------Flow Map -------------
+    $("#display-flow-overlay").click(function(){
+      var time=setTimeRange();
+      var cfg={
+        start_time:(time.start_time-time.start_date)%86400+time.start_date,
+        end_time:time.end_date-86400+(time.end_time-time.end_date)%86400+1
+      };
+      flow_cfg=jQuery.extend(true,flow_cfg,cfg);
+
+      if (flow_cfg.start_time!=undefined){
+        set_boundary(flow_cfg);
+        send_message(JSON.stringify(flow_cfg));
+      }
+    });
+
+    //------------------------------------Message Receiver----
+    connection.onmessage = wsMessage;
+    function wsMessage(event){
+      hide_dataloading();
+      var data_json=JSON.parse(event.data);
+      var data=[],grids=[],i,j,lat,lng,coord,max;
+      if (data_json[0]==0){
+        heatmap_obj.removeAll();
+        heatmap_obj.cfg=jQuery.extend(true,heatmap_obj.cfg,heatmap_cfg);
+        //show_slider();
+        /*$("#heatmap_video").val(0);
+         $("#slider_heatmap_video").data("ionRangeSlider").update({
+         "min":0,
+         "max":Math.floor((heatmap_obj.cfg.end_time-heatmap_obj.cfg.start_time-heatmap_obj.cfg.time_window)
+         /heatmap_obj.cfg.time_interval),
+         "from":0
+         });*/
+        for (i=0;i<heatmap_obj.cfg.grids_row*heatmap_obj.cfg.grids_col;i++){
+          lat = heatmap_obj.cfg.lat_top - (heatmap_obj.cfg.lat_top - heatmap_obj.cfg.lat_bottom)
+              * (Math.floor(i / heatmap_obj.cfg.grids_row) + 0.5) / heatmap_obj.cfg.grids_col;
+
+          lng = (heatmap_obj.cfg.lng_right - heatmap_obj.cfg.lng_left)
+              * (i % heatmap_obj.cfg.grids_row + 0.5)
+              / heatmap_obj.cfg.grids_row + heatmap_obj.cfg.lng_left;
+
+          coord = coordtransform.wgs84togcj02(lng, lat);
+          grids.push({
+            lat: coord[1],
+            lng: coord[0]
+          });
+        }
+        max=1;
+        for (j=0;j<Math.floor((heatmap_obj.cfg.end_time-heatmap_obj.cfg.start_time-heatmap_obj.cfg.time_window)
+            /heatmap_obj.cfg.time_interval)+1;j++){
+          data=[];
+          for (i=0;i<heatmap_obj.cfg.grids_row*heatmap_obj.cfg.grids_col;i++){
+            if (j*heatmap_obj.cfg.grids_row*heatmap_obj.cfg.grids_col+i+2>data_json.length)
+              break;
+            if (data_json[j*heatmap_obj.cfg.grids_row*heatmap_obj.cfg.grids_col+i+1]>0){
+              data.push({
+                lat:grids[i].lat,
+                lng:grids[i].lng,
+                count:data_json[j*heatmap_obj.cfg.grids_row*heatmap_obj.cfg.grids_col+i+1]
+              });
+              if (data_json[j*heatmap_obj.cfg.grids_row*heatmap_obj.cfg.grids_col+i+1]>max)
+                max=data_json[j*heatmap_obj.cfg.grids_row*heatmap_obj.cfg.grids_col+i+1];
+            }
+          }
+          heatmap_obj.addData(data);
+        }
+        heatmap_max=max;
+        show_slider();
+      } else if (data_json[0]==1){
+        var container=undefined;
+        for (i=0;i<radar_container_list.length;i++)
+          if (radar_container_list[i].id==data_json[1]) container=radar_container_list[i];
+        i=2; j=i+radar_chart_msg.arg;
+        while (j<=data_json.length){
+          var radar_chart=new RadarChart({});
+          radar_chart.addData(data_json.slice(i,j));
+          container.addRadar(radar_chart);
+          i=j;
+          j=i+8;
+        }
+        container.show();
+      } else if (data_json[0]==2){
+        //console.log(data_json);
+        i=0; var node_set=[], path=[];
+        cleanEdges();
+        while (i<data_json.length){
+          i++;
+          if (data_json[i]=="-1") {
+            path.push(jQuery.extend(true,[],node_set));
+            node_set=[];
+            continue;
+          }
+          var node_lat=data_json[i];
+          i++;
+          var node_lng=data_json[i];
+          coord = coordtransform.wgs84togcj02(node_lng, node_lat);
+          node_set.push({lat:coord[1],lng:coord[0]});
+        }
+
+        $("#edge-number").val(path.length);
+        for (i=0;i<path.length;i++){
+          //console.log(path[i]);
+          var flightPath = new google.maps.Polyline({
+            path: path[i],
+            geodesic: true,
+            strokeColor: '#0000FF',
+            strokeOpacity: line_opacity,
+            strokeWeight: 2
+          });
+          flightPath.setMap(map);
+          gmap_edges.push(flightPath);
+        }
+
+        function cleanEdges(){
+          for (var i=0;i<gmap_edges.length;i++)
+            gmap_edges[i].setMap(null);
+        }
+      } else if (data_json[0]==5){
+          console.log("chord data: ",data_json);
+          var obj_id = data_json[1];
+          addMarker(gmap_obj_array[obj_id]);
+          addInfoWindow(gmap_obj_array[obj_id]);
+          gmap_obj_array[obj_id].chord_data = [];
+          for (i=0;i<gmap_obj_array.length-1;i++){
+              var temp_array = new Array(gmap_obj_array.length-1);
+              for (j=0;j<gmap_obj_array.length-1;j++){
+                  temp_array[j] = data_json[i*(gmap_obj_array.length-1)+j+2];
+              }
+              gmap_obj_array[obj_id].chord_data.push(temp_array);
+          }
+          var temp_index = [];
+          var map_canvas = $("#map_canvas");
+          for (i=0;i<gmap_obj_array.length;i++){
+              if (i==obj_id) continue;
+              temp_index.push(
+                  {
+                      cfg:{
+                          cnt_x:gmap_obj_array[i].cnt_pixel.x,
+                          cnt_y:map_canvas.height()-gmap_obj_array[i].cnt_pixel.y
+                      }
+                  });
+          }
+          gmap_obj_array[obj_id].chordDiagram = new ChordDiagram(gmap_obj_array[obj_id].chord_data, temp_index
+              , gmap_obj_array[obj_id].info_window.content,{
+                  x:gmap_obj_array[obj_id].cnt_pixel.x,
+                  y:map_canvas.height()-gmap_obj_array[obj_id].cnt_pixel.y
+              });
+      }
+    }
+
+  }
+</script>
+</body>
+</html>
